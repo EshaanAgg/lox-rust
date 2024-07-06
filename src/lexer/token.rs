@@ -25,19 +25,39 @@ impl Token {
         match self.token_type {
             TokenType::EOF => format!("EOF  null"),
 
+            // Braces and Parentheses
             TokenType::LeftParen => format!("LEFT_PAREN {} null", self.lexeme),
             TokenType::RightParen => format!("RIGHT_PAREN {} null", self.lexeme),
             TokenType::LeftBrace => format!("LEFT_BRACE {} null", self.lexeme),
             TokenType::RightBrace => format!("RIGHT_BRACE {} null", self.lexeme),
 
+            // Operators
             TokenType::Star => format!("STAR {} null", self.lexeme),
             TokenType::Dot => format!("DOT {} null", self.lexeme),
             TokenType::Comma => format!("COMMA {} null", self.lexeme),
             TokenType::Semicolon => format!("SEMICOLON {} null", self.lexeme),
             TokenType::Plus => format!("PLUS {} null", self.lexeme),
             TokenType::Minus => format!("MINUS {} null", self.lexeme),
+            TokenType::Slash => format!("SLASH {} null", self.lexeme),
 
-            TokenType::Unknown => format!("[line {}] Unknown token: {}", self.line, self.lexeme),
+            // Equality and Negation
+            TokenType::Bang => format!("BANG {} null", self.lexeme),
+            TokenType::Equal => format!("EQUAL {} null", self.lexeme),
+            TokenType::EqualEqual => format!("EQUAL_EQUAL {} null", self.lexeme),
+            TokenType::NotEqual => format!("NOT_EQUAL {} null", self.lexeme),
+
+            // Relational Operators
+            TokenType::Greater => format!("GREATER {} null", self.lexeme),
+            TokenType::GreaterEqual => format!("GREATER_EQUAL {} null", self.lexeme),
+            TokenType::Less => format!("LESS {} null", self.lexeme),
+            TokenType::LessEqual => format!("LESS_EQUAL {} null", self.lexeme),
+
+            TokenType::Unknown => {
+                format!(
+                    "[line {}] Error: Unexpected character: {}",
+                    self.line, self.lexeme
+                )
+            }
         }
     }
 }

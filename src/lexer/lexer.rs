@@ -1,8 +1,5 @@
 use super::{token::Token, types::TokenType};
-use TokenType::{
-    Comma, Dot, LeftBrace, LeftParen, Minus, Plus, RightBrace, RightParen, Semicolon, Star,
-    Unknown, EOF,
-};
+use TokenType::*;
 
 #[derive(Debug)]
 pub struct Lexer {
@@ -48,23 +45,83 @@ impl Lexer {
         Token::new(token_type, lexeme, self.line, self.character)
     }
 
+    /// Skips any whitespace characters in the source code.
+    /// Whitespace characters include spaces, tabs, carriage returns, and newlines.
+    fn skip_whitespace(&mut self) {
+        while let Some(ch) = self.peek() {
+            match ch {
+                ' ' | '\t' | '\r' | '\n' => {
+                    self.consume();
+                }
+                _ => break,
+            }
+        }
+    }
+
     /// Returns the next token in the source code. It consumes the source code
     /// character by character and returns a token for each character.
     pub fn next_token(&mut self) -> Token {
+        self.skip_whitespace();
+
         match self.consume() {
             None => self.new_token(EOF, ""),
             Some(ch) => match ch {
+                // Braces and Parentheses
                 '(' => self.new_token(LeftParen, "("),
                 ')' => self.new_token(RightParen, ")"),
                 '{' => self.new_token(LeftBrace, "{"),
                 '}' => self.new_token(RightBrace, "}"),
 
+                // Operators
                 '*' => self.new_token(Star, "*"),
                 '.' => self.new_token(Dot, "."),
                 ',' => self.new_token(Comma, ","),
                 ';' => self.new_token(Semicolon, ";"),
                 '+' => self.new_token(Plus, "+"),
                 '-' => self.new_token(Minus, "-"),
+                '/' => {
+                    if self.peek() == Some('/') {
+                        // The following characters are a comment
+                        while self.peek() != Some('\n') && self.peek() != None {
+                            self.consume();
+                        }
+                        self.next_token()
+                    } else {
+                        self.new_token(Slash, "/")
+                    }
+                }
+
+                // Equality and Negation
+                '=' => match self.peek() {
+                    Some('=') => {
+                        self.consume();
+                        self.new_token(EqualEqual, "==")
+                    }
+                    _ => self.new_token(Equal, "="),
+                },
+                '!' => match self.peek() {
+                    Some('=') => {
+                        self.consume();
+                        self.new_token(NotEqual, "!=")
+                    }
+                    _ => self.new_token(Bang, "!"),
+                },
+
+                // Relational Operators
+                '>' => match self.peek() {
+                    Some('=') => {
+                        self.consume();
+                        self.new_token(GreaterEqual, ">=")
+                    }
+                    _ => self.new_token(Greater, ">"),
+                },
+                '<' => match self.peek() {
+                    Some('=') => {
+                        self.consume();
+                        self.new_token(LessEqual, "<=")
+                    }
+                    _ => self.new_token(Less, "<"),
+                },
 
                 _ => self.new_token(Unknown, String::from(ch).as_str()),
             },
