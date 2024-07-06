@@ -1,37 +1,41 @@
 use std::env;
 use std::fs;
-use std::io::{self, Write};
+use std::io::{stderr, Write};
+
+mod lexer;
+use lexer::lexer::Lexer;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 3 {
-        writeln!(io::stderr(), "Usage: {} tokenize <filename>", args[0]).unwrap();
-        return;
+        writeln!(stderr(), "Usage: {} <command> <filename>", args[0])
+            .expect("Failed to write to stderr");
+        std::process::exit(1);
     }
 
     let command = &args[1];
     let filename = &args[2];
 
+    let file_contents = fs::read_to_string(filename).unwrap_or_else(|err| {
+        writeln!(stderr(), "Failed to read file {}: {}", filename, err)
+            .expect("Failed to write to stderr");
+        String::new()
+    });
+    let mut lexer = Lexer::new(&file_contents);
+
     match command.as_str() {
         "tokenize" => {
-            // You can use print statements as follows for debugging, they'll be visible when running tests.
-            writeln!(io::stderr(), "Logs from your program will appear here!").unwrap();
-
-            let file_contents = fs::read_to_string(filename).unwrap_or_else(|_| {
-                writeln!(io::stderr(), "Failed to read file {}", filename).unwrap();
-                String::new()
-            });
-
-            // Uncomment this block to pass the first stage
-            // if !file_contents.is_empty() {
-            //     panic!("Scanner not implemented");
-            // } else {
-            //     println!("EOF  null"); // Placeholder, remove this line when implementing the scanner
-            // }
+            let (valid_tokens, invalid_tokens) = lexer.get_tokens();
+            for token in invalid_tokens {
+                println!("{}", token.tokenized_string());
+            }
+            for token in valid_tokens {
+                println!("{}", token.tokenized_string());
+            }
         }
+
         _ => {
-            writeln!(io::stderr(), "Unknown command: {}", command).unwrap();
-            return;
+            writeln!(stderr(), "Unknown command: {}", command).expect("Failed to write to stderr");
         }
     }
 }
