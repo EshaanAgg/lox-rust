@@ -30,11 +30,12 @@ fn main() {
         "tokenize" => {
             let (valid_tokens, invalid_tokens) = lexer.get_tokens();
 
-            invalid_tokens.iter().for_each(|token| {
-                println!("{}", token.tokenized_string());
-            });
             valid_tokens.iter().for_each(|token| {
                 println!("{}", token.tokenized_string());
+            });
+            invalid_tokens.iter().for_each(|token| {
+                writeln!(stderr(), "{}", token.tokenized_string())
+                    .expect("Failed to write to stderr");
             });
 
             if !invalid_tokens.is_empty() {
