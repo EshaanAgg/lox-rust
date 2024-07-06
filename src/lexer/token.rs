@@ -44,7 +44,7 @@ impl Token {
             TokenType::Bang => format!("BANG {} null", self.lexeme),
             TokenType::Equal => format!("EQUAL {} null", self.lexeme),
             TokenType::EqualEqual => format!("EQUAL_EQUAL {} null", self.lexeme),
-            TokenType::NotEqual => format!("NOT_EQUAL {} null", self.lexeme),
+            TokenType::BangEqual => format!("BANG_EQUAL {} null", self.lexeme),
 
             // Relational Operators
             TokenType::Greater => format!("GREATER {} null", self.lexeme),

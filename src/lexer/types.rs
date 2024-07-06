@@ -22,7 +22,7 @@ pub enum TokenType {
     Bang,
     Equal,
     EqualEqual,
-    NotEqual,
+    BangEqual,
 
     // Relational Operators
     Greater,

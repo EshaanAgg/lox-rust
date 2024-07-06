@@ -102,7 +102,7 @@ impl Lexer {
                 '!' => match self.peek() {
                     Some('=') => {
                         self.consume();
-                        self.new_token(NotEqual, "!=")
+                        self.new_token(BangEqual, "!=")
                     }
                     _ => self.new_token(Bang, "!"),
                 },
