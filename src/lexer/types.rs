@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum TokenType {
     EOF,
     Unknown,
@@ -29,4 +29,8 @@ pub enum TokenType {
     GreaterEqual,
     Less,
     LessEqual,
+
+    // Literals
+    String(String),
+    UnterminatedString(String),
 }

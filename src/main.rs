@@ -28,17 +28,19 @@ fn main() {
 
     match command.as_str() {
         "tokenize" => {
-            let (valid_tokens, invalid_tokens) = lexer.get_tokens();
+            let mut has_lexical_error = false;
 
-            valid_tokens.iter().for_each(|token| {
-                println!("{}", token.tokenized_string());
-            });
-            invalid_tokens.iter().for_each(|token| {
-                writeln!(stderr(), "{}", token.tokenized_string())
-                    .expect("Failed to write to stderr");
+            lexer.get_tokens().iter().for_each(|token| {
+                if token.is_error() {
+                    writeln!(stderr(), "{}", token.tokenized_string())
+                        .expect("Failed to write to stderr");
+                    has_lexical_error = true;
+                } else {
+                    println!("{}", token.tokenized_string());
+                }
             });
 
-            if !invalid_tokens.is_empty() {
+            if has_lexical_error {
                 std::process::exit(EXIT_LEXICAL_ERROR);
             }
         }

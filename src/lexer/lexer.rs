@@ -1,4 +1,6 @@
 use super::{token::Token, types::TokenType};
+
+use std::string::String;
 use TokenType::*;
 
 #[derive(Debug)]
@@ -123,34 +125,49 @@ impl Lexer {
                     _ => self.new_token(Less, "<"),
                 },
 
+                // String Literals
+                '"' => {
+                    let mut literal = String::new();
+                    let mut lexeme = String::from(ch);
+
+                    while let Some(ch) = self.peek() {
+                        if ch == '\n' {
+                            // Arrived at a newline character before the string was terminated. Example values:
+                            // Lexeme: "abc
+                            // Literal: abc
+                            return self.new_token(UnterminatedString(literal), lexeme.as_str());
+                        }
+
+                        lexeme.push(ch);
+                        self.consume();
+                        if ch == '"' {
+                            return self.new_token(String(literal), lexeme.as_str());
+                        }
+
+                        literal.push(ch);
+                    }
+
+                    self.new_token(UnterminatedString(literal), lexeme.as_str())
+                }
+
                 _ => self.new_token(Unknown, String::from(ch).as_str()),
             },
         }
     }
 
-    /// Returns a tuple of two vectors containing the tokens from the source code.
-    /// The first vector contains the tokens that were successfully parsed, and the
-    /// second vector contains the tokens that were not successfully parsed (Unknown tokens)
-    /// Both the vectors contain the tokens in the order they appear in the source code.
-    pub fn get_tokens(&mut self) -> (Vec<Token>, Vec<Token>) {
+    /// Returns a vector of tokens from the source code.
+    pub fn get_tokens(&mut self) -> Vec<Token> {
         let mut tokens = Vec::new();
-        let mut unknown_tokens = Vec::new();
 
         let mut to_break = false;
         while !to_break {
             let token = self.next_token();
-
             if token.token_type == EOF {
                 to_break = true;
             }
-
-            if token.token_type == Unknown {
-                unknown_tokens.push(token);
-            } else {
-                tokens.push(token);
-            }
+            tokens.push(token);
         }
 
-        (tokens, unknown_tokens)
+        tokens
     }
 }

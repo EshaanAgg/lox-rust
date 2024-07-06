@@ -22,7 +22,7 @@ impl Token {
     /// <token_type> <lexeme> <literal>
     /// This is used for the "tokenize" command.
     pub fn tokenized_string(&self) -> String {
-        match self.token_type {
+        match &self.token_type {
             TokenType::EOF => format!("EOF  null"),
 
             // Braces and Parentheses
@@ -52,12 +52,26 @@ impl Token {
             TokenType::Less => format!("LESS {} null", self.lexeme),
             TokenType::LessEqual => format!("LESS_EQUAL {} null", self.lexeme),
 
+            // Literals
+            TokenType::String(val) => format!("STRING {} {}", self.lexeme, val),
+
+            // Error
+            TokenType::UnterminatedString(_) => {
+                format!("[line {}] Error: Unterminated string.", self.line)
+            }
             TokenType::Unknown => {
                 format!(
                     "[line {}] Error: Unexpected character: {}",
                     self.line, self.lexeme
                 )
             }
+        }
+    }
+
+    pub fn is_error(&self) -> bool {
+        match self.token_type {
+            TokenType::Unknown | TokenType::UnterminatedString(_) => true,
+            _ => false,
         }
     }
 }
