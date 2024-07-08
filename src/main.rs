@@ -32,11 +32,11 @@ fn main() {
 
             lexer.get_tokens().iter().for_each(|token| {
                 if token.is_error() {
-                    writeln!(stderr(), "{} {}", token.tokenized_string(), token.line)
+                    writeln!(stderr(), "{}", token.tokenized_string())
                         .expect("Failed to write to stderr");
                     has_lexical_error = true;
                 } else {
-                    println!("{} {}", token.tokenized_string(), token.line);
+                    println!("{}", token.tokenized_string());
                 }
             });
 
