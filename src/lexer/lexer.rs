@@ -225,8 +225,14 @@ impl Lexer {
                 _ => {
                     if Self::is_digit(ch) {
                         self.current -= 1; // As we will consume the character again in parse_number
+
+                        let start_pos = self.current;
                         let num = self.parse_number();
-                        return self.new_token(Number(num), num.to_string().as_str());
+                        let lexeme = &self.characters[start_pos..self.current]
+                            .iter()
+                            .collect::<String>();
+
+                        return self.new_token(Number(num), lexeme);
                     }
 
                     if Self::is_identifier(ch) {
