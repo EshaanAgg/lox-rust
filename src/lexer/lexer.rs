@@ -42,6 +42,16 @@ impl Lexer {
         next
     }
 
+    /// Consumes the next character in the source code and checks if it matches the expected character.
+    fn match_next(&mut self, expected: char) -> bool {
+        if self.peek() == Some(expected) {
+            self.consume();
+            true
+        } else {
+            false
+        }
+    }
+
     /// Creates a new token with the given token type and lexeme.
     fn new_token(&self, token_type: TokenType, lexeme: &str) -> Token {
         Token::new(token_type, lexeme, self.line, self.character)
@@ -58,6 +68,100 @@ impl Lexer {
                 _ => break,
             }
         }
+    }
+
+    /// Returns if the provided digit is a 0-9 digit
+    fn is_digit(c: char) -> bool {
+        return c >= '0' && c <= '9';
+    }
+
+    /// Returns if the provided character is an identifier character
+    fn is_identifier(c: char) -> bool {
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
+    }
+
+    /// Returns if the provided character is an alphanumeric character
+    fn is_aplhanumeric(c: char) -> bool {
+        return Self::is_digit(c) || Self::is_identifier(c);
+    }
+
+    /// Parses an identifier from the input. It assumes that it has already been
+    /// checked that the first character is an identifier character.
+    fn parse_identifier(&mut self) -> String {
+        let mut identifier = String::new();
+
+        while let Some(ch) = self.peek() {
+            if !Self::is_aplhanumeric(ch) {
+                break;
+            }
+
+            self.consume();
+            identifier.push(ch);
+        }
+
+        identifier
+    }
+
+    /// Parses an integer from the input. Returns the parsed integer
+    /// and the number of characters consumed
+    fn parse_integer(&mut self) -> (u32, usize) {
+        let mut res = 0;
+        let mut consumed = 0;
+
+        while let Some(ch) = self.peek() {
+            if !Self::is_digit(ch) {
+                break;
+            }
+
+            self.consume();
+            consumed += 1;
+            let digit = ch as u32 - ('0' as u32);
+            res = res * 10 + digit;
+        }
+
+        (res, consumed)
+    }
+
+    /// Parses a floating-point or integer number from the source code.
+    fn parse_number(&mut self) -> f32 {
+        let mut num = self.parse_integer().0 as f32;
+
+        if self.match_next('.') {
+            if let Some(ch) = self.peek() {
+                if Self::is_digit(ch) {
+                    let (fr, len) = self.parse_integer();
+                    num += fr as f32 / 10_f32.powi(len as i32);
+                }
+            }
+        }
+
+        num
+    }
+
+    /// Parses a string token from the source code.
+    fn parse_string_token(&mut self) -> Token {
+        let mut literal = String::new();
+        let mut lexeme = String::from('"');
+
+        while let Some(ch) = self.peek() {
+            lexeme.push(ch);
+
+            // Reached the end of the line before the string was terminated
+            if ch == '\n' {
+                return self.new_token(UnterminatedString(literal), lexeme.as_str());
+            }
+
+            self.consume();
+
+            if ch == '"' {
+                return self.new_token(String(literal), lexeme.as_str());
+            }
+
+            literal.push(ch);
+        }
+
+        // Reached the end of the source code before the string was terminated
+        self.new_token(UnterminatedString(literal), lexeme.as_str())
     }
 
     /// Returns the next token in the source code. It consumes the source code
@@ -94,63 +198,46 @@ impl Lexer {
                 }
 
                 // Equality and Negation
-                '=' => match self.peek() {
-                    Some('=') => {
-                        self.consume();
-                        self.new_token(EqualEqual, "==")
-                    }
-                    _ => self.new_token(Equal, "="),
+                '=' => match self.match_next('=') {
+                    true => self.new_token(EqualEqual, "=="),
+                    false => self.new_token(Equal, "="),
                 },
-                '!' => match self.peek() {
-                    Some('=') => {
-                        self.consume();
-                        self.new_token(BangEqual, "!=")
-                    }
-                    _ => self.new_token(Bang, "!"),
+                '!' => match self.match_next('=') {
+                    true => self.new_token(BangEqual, "!="),
+                    false => self.new_token(Bang, "!"),
                 },
 
                 // Relational Operators
-                '>' => match self.peek() {
-                    Some('=') => {
-                        self.consume();
-                        self.new_token(GreaterEqual, ">=")
-                    }
-                    _ => self.new_token(Greater, ">"),
+                '>' => match self.match_next('=') {
+                    true => self.new_token(GreaterEqual, ">="),
+                    false => self.new_token(Greater, ">"),
                 },
-                '<' => match self.peek() {
-                    Some('=') => {
-                        self.consume();
-                        self.new_token(LessEqual, "<=")
-                    }
-                    _ => self.new_token(Less, "<"),
+                '<' => match self.match_next('=') {
+                    true => self.new_token(LessEqual, "<="),
+                    false => self.new_token(Less, "<"),
                 },
 
-                // String Literals
-                '"' => {
-                    let mut literal = String::new();
-                    let mut lexeme = String::from(ch);
+                // Literals
+                '"' => self.parse_string_token(),
 
-                    while let Some(ch) = self.peek() {
-                        if ch == '\n' {
-                            // Arrived at a newline character before the string was terminated. Example values:
-                            // Lexeme: "abc
-                            // Literal: abc
-                            return self.new_token(UnterminatedString(literal), lexeme.as_str());
-                        }
-
-                        lexeme.push(ch);
-                        self.consume();
-                        if ch == '"' {
-                            return self.new_token(String(literal), lexeme.as_str());
-                        }
-
-                        literal.push(ch);
+                _ => {
+                    if Self::is_digit(ch) {
+                        let num = self.parse_number();
+                        return self.new_token(Number(num), num.to_string().as_str());
                     }
 
-                    self.new_token(UnterminatedString(literal), lexeme.as_str())
+                    if Self::is_identifier(ch) {
+                        let identifier = self.parse_identifier();
+
+                        if let Some(keyword) = TokenType::check_keyword(identifier.as_str()) {
+                            return self.new_token(keyword, identifier.as_str());
+                        }
+
+                        return self.new_token(Identifier(identifier.clone()), identifier.as_str());
+                    }
+
+                    self.new_token(Unknown, String::from(ch).as_str())
                 }
-
-                _ => self.new_token(Unknown, String::from(ch).as_str()),
             },
         }
     }

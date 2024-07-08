@@ -54,6 +54,26 @@ impl Token {
 
             // Literals
             TokenType::String(val) => format!("STRING {} {}", self.lexeme, val),
+            TokenType::Number(val) => format!("NUMBER {} {}", self.lexeme, val),
+            TokenType::Identifier(val) => format!("IDENTIFIER {} {}", self.lexeme, val),
+
+            // Keywords
+            TokenType::AND => format!("AND {} null", self.lexeme),
+            TokenType::CLASS => format!("CLASS {} null", self.lexeme),
+            TokenType::ELSE => format!("ELSE {} null", self.lexeme),
+            TokenType::FALSE => format!("FALSE {} null", self.lexeme),
+            TokenType::FOR => format!("FOR {} null", self.lexeme),
+            TokenType::FUN => format!("FUN {} null", self.lexeme),
+            TokenType::IF => format!("IF {} null", self.lexeme),
+            TokenType::NIL => format!("NIL {} null", self.lexeme),
+            TokenType::OR => format!("OR {} null", self.lexeme),
+            TokenType::PRINT => format!("PRINT {} null", self.lexeme),
+            TokenType::RETURN => format!("RETURN {} null", self.lexeme),
+            TokenType::SUPER => format!("SUPER {} null", self.lexeme),
+            TokenType::THIS => format!("THIS {} null", self.lexeme),
+            TokenType::TRUE => format!("TRUE {} null", self.lexeme),
+            TokenType::VAR => format!("VAR {} null", self.lexeme),
+            TokenType::WHILE => format!("WHILE {} null", self.lexeme),
 
             // Error
             TokenType::UnterminatedString(_) => {
