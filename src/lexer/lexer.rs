@@ -222,11 +222,13 @@ impl Lexer {
 
                 _ => {
                     if Self::is_digit(ch) {
+                        self.current -= 1; // As we will consume the character again in parse_number
                         let num = self.parse_number();
                         return self.new_token(Number(num), num.to_string().as_str());
                     }
 
                     if Self::is_identifier(ch) {
+                        self.current -= 1; // As we will consume the character again in parse_identifier
                         let identifier = self.parse_identifier();
 
                         if let Some(keyword) = TokenType::check_keyword(identifier.as_str()) {
