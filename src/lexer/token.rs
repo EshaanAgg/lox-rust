@@ -62,7 +62,7 @@ impl Token {
                     format!("{}", val)
                 }
             }),
-            TokenType::Identifier(val) => format!("IDENTIFIER {} {}", self.lexeme, val),
+            TokenType::Identifier(val) => format!("IDENTIFIER {} null", self.lexeme),
 
             // Keywords
             TokenType::AND => format!("AND {} null", self.lexeme),
