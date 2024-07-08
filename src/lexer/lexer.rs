@@ -28,6 +28,10 @@ impl Lexer {
         self.characters.get(self.current).copied()
     }
 
+    fn peek_next(&self) -> Option<char> {
+        self.characters.get(self.current + 1).copied()
+    }
+
     /// Consumes the next character in the source code and returns it.
     fn consume(&mut self) -> Option<char> {
         let next = self.peek();
@@ -126,13 +130,11 @@ impl Lexer {
     fn parse_number(&mut self) -> f32 {
         let mut num = self.parse_integer().0 as f32;
 
-        if self.match_next('.') {
-            if let Some(ch) = self.peek() {
-                if Self::is_digit(ch) {
-                    let (fr, len) = self.parse_integer();
-                    num += fr as f32 / 10_f32.powi(len as i32);
-                }
-            }
+        if self.peek() == Some('.') && self.peek_next().map_or(false, |ch| Self::is_digit(ch)) {
+            self.consume(); // Consume the dot
+
+            let (fr, len) = self.parse_integer();
+            num += fr as f32 / 10_f32.powi(len as i32);
         }
 
         num

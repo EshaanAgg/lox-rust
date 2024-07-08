@@ -54,7 +54,14 @@ impl Token {
 
             // Literals
             TokenType::String(val) => format!("STRING {} {}", self.lexeme, val),
-            TokenType::Number(val) => format!("NUMBER {} {}", self.lexeme, val),
+            TokenType::Number(val) => format!("NUMBER {} {}", self.lexeme, {
+                // Check if the number is an integer
+                if val.fract() == 0.0 {
+                    val.to_string().replace(".0", "")
+                } else {
+                    val.to_string()
+                }
+            }),
             TokenType::Identifier(val) => format!("IDENTIFIER {} {}", self.lexeme, val),
 
             // Keywords
