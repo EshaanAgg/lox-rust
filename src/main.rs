@@ -2,7 +2,9 @@ use std::env;
 use std::fs;
 use std::io::{stderr, Write};
 
+mod ast;
 mod lexer;
+
 use lexer::lexer::Lexer;
 
 const EXIT_FILE_ERROR: i32 = 1;

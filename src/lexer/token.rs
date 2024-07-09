@@ -9,12 +9,24 @@ pub struct Token {
 }
 
 impl Token {
+    /// Creates a new token with the given token type, lexeme, line, and character values.
     pub fn new(token_type: TokenType, lexeme: &str, line: u32, character: u32) -> Self {
         Token {
             token_type,
             lexeme: lexeme.to_string(),
             line,
             character,
+        }
+    }
+
+    /// Creates a new token with the default line and character values of 0.
+    /// This is intended to be only used for testing purposes.
+    pub fn new_default(token_type: TokenType, lexeme: &str) -> Self {
+        Token {
+            token_type,
+            lexeme: lexeme.to_string(),
+            line: 0,
+            character: 0,
         }
     }
 
