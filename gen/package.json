@@ -1,0 +1,14 @@
+{
+  "name": "gen",
+  "version": "1.0.0",
+  "description": "Generate boiler plate rust code for the language",
+  "scripts": {
+    "gen": "npx ts-node src/index.ts"
+  },
+  "author": "EshaanAgg",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "typescript": "^5.5.3"
+  }
+}
