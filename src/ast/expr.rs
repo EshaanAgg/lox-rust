@@ -1,6 +1,7 @@
 use crate::lexer::token::Token;
 use crate::lexer::types::TokenType;
 
+#[derive(Debug)]
 pub enum Expr {
     Unary(Token, Box<Expr>),
     Binary(Box<Expr>, Token, Box<Expr>),

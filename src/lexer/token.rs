@@ -1,16 +1,17 @@
 use super::types::TokenType;
+use std::fmt;
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(PartialEq, Clone)]
 pub struct Token {
     pub token_type: TokenType,
     pub lexeme: String,
-    pub line: u32,
-    pub character: u32,
+    pub line: usize,
+    pub character: usize,
 }
 
 impl Token {
     /// Creates a new token with the given token type, lexeme, line, and character values.
-    pub fn new(token_type: TokenType, lexeme: &str, line: u32, character: u32) -> Self {
+    pub fn new(token_type: TokenType, lexeme: &str, line: usize, character: usize) -> Self {
         Token {
             token_type,
             lexeme: lexeme.to_string(),
@@ -112,5 +113,14 @@ impl Token {
             TokenType::Unknown | TokenType::UnterminatedString(_) => true,
             _ => false,
         }
+    }
+}
+
+/// Implements the Debug trait for the Token struct.
+/// We only want to display the token type when debugging, and not the entire struct
+/// with fields like lexeme, line, and character.
+impl fmt::Debug for Token {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self.token_type)
     }
 }

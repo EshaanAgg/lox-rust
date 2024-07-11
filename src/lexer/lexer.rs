@@ -8,8 +8,8 @@ pub struct Lexer {
     characters: Vec<char>,
 
     current: usize,
-    line: u32,
-    character: u32,
+    line: usize,
+    character: usize,
 }
 
 impl Lexer {
@@ -108,7 +108,7 @@ impl Lexer {
 
     /// Parses an integer from the input. Returns the parsed integer
     /// and the number of characters consumed
-    fn parse_integer(&mut self) -> (u32, usize) {
+    fn parse_integer(&mut self) -> (usize, usize) {
         let mut res = 0;
         let mut consumed = 0;
 
@@ -119,7 +119,7 @@ impl Lexer {
 
             self.consume();
             consumed += 1;
-            let digit = ch as u32 - ('0' as u32);
+            let digit = ch as usize - ('0' as usize);
             res = res * 10 + digit;
         }
 

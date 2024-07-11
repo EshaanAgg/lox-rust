@@ -2,7 +2,7 @@ use super::expr::{Expr, Visitor};
 use crate::lexer::token::Token;
 use crate::lexer::types::TokenType;
 
-struct AstPrinter;
+pub struct AstPrinter;
 
 impl Visitor<String> for AstPrinter {
     fn visit_unary_expr(&self, op: &Token, expr: &Box<Expr>) -> String {
@@ -75,6 +75,7 @@ fn test_print() {
     ];
 
     for t in testcases {
+        println!("Testing: {:?}", t.input);
         assert_eq!(AstPrinter::print(t.input), t.expected);
     }
 }

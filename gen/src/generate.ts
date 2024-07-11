@@ -16,7 +16,8 @@ export interface Config {
 }
 
 const createEnumDefinition = (config: Config): string => {
-  let definition = `pub enum ${config.baseName} {\n`;
+  let definition = `#[derive(Debug)]
+pub enum ${config.baseName} {\n`;
 
   definition += config.types
     .map((type) => {
