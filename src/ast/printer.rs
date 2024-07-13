@@ -22,7 +22,7 @@ impl Visitor<String> for AstPrinter {
         match &token.token_type {
             TokenType::String(str) => str.to_string(),
             TokenType::Number(num) => num.to_string(),
-            _ => "nil".to_string(),
+            _ => "not implemented".to_string(),
         }
     }
 

@@ -153,7 +153,6 @@ impl SyntaxTree {
             Some(token) => match token.token_type {
                 TokenType::String(_)
                 | TokenType::Number(_)
-                | TokenType::Identifier(_)
                 | TokenType::TRUE
                 | TokenType::FALSE
                 | TokenType::NIL => Ok(Expr::Literal(token)),
