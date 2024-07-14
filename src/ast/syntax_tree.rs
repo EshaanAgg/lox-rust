@@ -26,7 +26,7 @@ impl ParserError {
 }
 
 impl SyntaxTree {
-    fn new(tokens: Vec<Token>) -> Self {
+    pub fn new(tokens: Vec<Token>) -> Self {
         SyntaxTree { tokens, current: 0 }
     }
 

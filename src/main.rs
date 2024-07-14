@@ -6,6 +6,8 @@ mod ast;
 mod lexer;
 
 use lexer::lexer::Lexer;
+use ast::syntax_tree::SyntaxTree;
+use ast::printer::AstPrinter;
 
 const EXIT_FILE_ERROR: i32 = 1;
 const EXIT_LEXICAL_ERROR: i32 = 65;
@@ -45,6 +47,13 @@ fn main() {
             if has_lexical_error {
                 std::process::exit(EXIT_LEXICAL_ERROR);
             }
+        }
+
+        "parse" => {
+            let tokens = lexer.get_tokens();
+            let mut parser = SyntaxTree::new(tokens);
+            let expr = parser.expression().unwrap();
+            println!("{}", AstPrinter::print(expr));
         }
 
         _ => {

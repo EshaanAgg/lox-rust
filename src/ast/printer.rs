@@ -20,8 +20,9 @@ impl Visitor<String> for AstPrinter {
 
     fn visit_literal_expr(&self, token: &Token) -> String {
         match &token.token_type {
-            TokenType::String(str) => str.to_string(),
-            TokenType::Number(num) => num.to_string(),
+            TokenType::String(_) | TokenType::Number(_) => {
+                token.get_value()
+            }
             _ => "not implemented".to_string(),
         }
     }

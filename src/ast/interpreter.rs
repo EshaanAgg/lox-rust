@@ -158,3 +158,75 @@ impl Visitor<Result<Value, Error>> for Interpreter {
         }
     }
 }
+
+#[test]
+fn test_interpreter() {
+    struct TestCase {
+        description: &'static str,
+        input: &'static str,
+        expected: Value,
+        should_err: bool,
+    }
+
+    let test_cases = vec![
+        TestCase {
+            description: "Addition",
+            input: "12 + 34",
+            expected: Value::Number(46.0),
+            should_err: false,
+        },
+        TestCase {
+            description: "Comparison",
+            input: "12 > 34",
+            expected: Value::Boolean(false),
+            should_err: false,
+        },
+        TestCase {
+            description: "Nested expressions",
+            input: "1 + (2 - 3) * 4",
+            expected: Value::Number(-3.0),
+            should_err: false,
+        },
+        TestCase {
+            description: "String concatenation",
+            input: "\"Hello\" + \" \" + \"World\"",
+            expected: Value::String("Hello World".to_string()),
+            should_err: false,
+        },
+        TestCase {
+            description: "Invalid operation",
+            input: "12 + \"Hello\"",
+            expected: Value::Nil,
+            should_err: true,
+        },
+        TestCase {
+            description: "Invalid boolean arithmetic",
+            input: "true + false",
+            expected: Value::Nil,
+            should_err: true,
+        },
+        TestCase {
+            description: "Invalid boolean operation",
+            input: "(1 == 2) + 3",
+            expected: Value::Nil,
+            should_err: true,
+        },
+    ];
+
+    let interpreter = Interpreter {};
+    for test in test_cases {
+        let tokens = crate::lexer::lexer::Lexer::new(test.input).get_tokens();
+        let mut parser = super::syntax_tree::SyntaxTree::new(tokens);
+        let expr = parser.expression().unwrap();
+        let result = expr.accept(&interpreter);
+
+        match (result, test.should_err) {
+            (Ok(val), false) => assert_eq!(val, test.expected),
+            (Err(_), true) => {}
+            (res, _) => panic!(
+                "Test failed: {}\nExpected: {:?}\nGot: {:?}",
+                test.description, test.expected, res
+            ),
+        }
+    }
+}

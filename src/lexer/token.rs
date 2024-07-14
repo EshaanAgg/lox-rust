@@ -31,71 +31,82 @@ impl Token {
         }
     }
 
-    /// Returns a string representation of the token in the format:
-    /// <token_type> <lexeme> <literal>
-    /// This is used for the "tokenize" command.
-    pub fn tokenized_string(&self) -> String {
+    /// Returns the value of the token as a string.
+    pub fn get_value(&self) -> String {
         match &self.token_type {
-            TokenType::EOF => format!("EOF  null"),
-
-            // Braces and Parentheses
-            TokenType::LeftParen => format!("LEFT_PAREN {} null", self.lexeme),
-            TokenType::RightParen => format!("RIGHT_PAREN {} null", self.lexeme),
-            TokenType::LeftBrace => format!("LEFT_BRACE {} null", self.lexeme),
-            TokenType::RightBrace => format!("RIGHT_BRACE {} null", self.lexeme),
-
-            // Operators
-            TokenType::Star => format!("STAR {} null", self.lexeme),
-            TokenType::Dot => format!("DOT {} null", self.lexeme),
-            TokenType::Comma => format!("COMMA {} null", self.lexeme),
-            TokenType::Semicolon => format!("SEMICOLON {} null", self.lexeme),
-            TokenType::Plus => format!("PLUS {} null", self.lexeme),
-            TokenType::Minus => format!("MINUS {} null", self.lexeme),
-            TokenType::Slash => format!("SLASH {} null", self.lexeme),
-
-            // Equality and Negation
-            TokenType::Bang => format!("BANG {} null", self.lexeme),
-            TokenType::Equal => format!("EQUAL {} null", self.lexeme),
-            TokenType::EqualEqual => format!("EQUAL_EQUAL {} null", self.lexeme),
-            TokenType::BangEqual => format!("BANG_EQUAL {} null", self.lexeme),
-
-            // Relational Operators
-            TokenType::Greater => format!("GREATER {} null", self.lexeme),
-            TokenType::GreaterEqual => format!("GREATER_EQUAL {} null", self.lexeme),
-            TokenType::Less => format!("LESS {} null", self.lexeme),
-            TokenType::LessEqual => format!("LESS_EQUAL {} null", self.lexeme),
-
-            // Literals
-            TokenType::String(val) => format!("STRING {} {}", self.lexeme, val),
-            TokenType::Number(val) => format!("NUMBER {} {}", self.lexeme, {
+            TokenType::Number(val) => {
                 // If the number is an integer, display it with one decimal place
                 if val.fract() == 0.0 {
                     format!("{:.1}", val)
                 } else {
                     format!("{}", val)
                 }
-            }),
-            TokenType::Identifier(_) => format!("IDENTIFIER {} null", self.lexeme),
+            },
+            TokenType::String(val) => val.to_string(),
+            _ => "null".to_string(),
+        }
+    }
 
-            // Keywords
-            TokenType::AND => format!("AND {} null", self.lexeme),
-            TokenType::CLASS => format!("CLASS {} null", self.lexeme),
-            TokenType::ELSE => format!("ELSE {} null", self.lexeme),
-            TokenType::FALSE => format!("FALSE {} null", self.lexeme),
-            TokenType::FOR => format!("FOR {} null", self.lexeme),
-            TokenType::FUN => format!("FUN {} null", self.lexeme),
-            TokenType::IF => format!("IF {} null", self.lexeme),
-            TokenType::NIL => format!("NIL {} null", self.lexeme),
-            TokenType::OR => format!("OR {} null", self.lexeme),
-            TokenType::PRINT => format!("PRINT {} null", self.lexeme),
-            TokenType::RETURN => format!("RETURN {} null", self.lexeme),
-            TokenType::SUPER => format!("SUPER {} null", self.lexeme),
-            TokenType::THIS => format!("THIS {} null", self.lexeme),
-            TokenType::TRUE => format!("TRUE {} null", self.lexeme),
-            TokenType::VAR => format!("VAR {} null", self.lexeme),
-            TokenType::WHILE => format!("WHILE {} null", self.lexeme),
+    /// Returns the name of the token type as a string.
+    pub fn get_name(&self) -> String {
+        match &self.token_type {
+            TokenType::EOF => "EOF".to_string(),
 
-            // Error
+            TokenType::LeftParen => "LEFT_PAREN".to_string(),
+            TokenType::RightParen => "RIGHT_PAREN".to_string(),
+            TokenType::LeftBrace => "LEFT_BRACE".to_string(),
+            TokenType::RightBrace => "RIGHT_BRACE".to_string(),
+
+            TokenType::Star => "STAR".to_string(),
+            TokenType::Dot => "DOT".to_string(),
+            TokenType::Comma => "COMMA".to_string(),
+            TokenType::Semicolon => "SEMICOLON".to_string(),
+            TokenType::Plus => "PLUS".to_string(),
+            TokenType::Minus => "MINUS".to_string(),
+            TokenType::Slash => "SLASH".to_string(),
+
+            TokenType::Bang => "BANG".to_string(),
+            TokenType::Equal => "EQUAL".to_string(),
+            TokenType::EqualEqual => "EQUAL_EQUAL".to_string(),
+            TokenType::BangEqual => "BANG_EQUAL".to_string(),
+
+            TokenType::Greater => "GREATER".to_string(),
+            TokenType::GreaterEqual => "GREATER_EQUAL".to_string(),
+            TokenType::Less => "LESS".to_string(),
+            TokenType::LessEqual => "LESS_EQUAL".to_string(),
+
+            TokenType::String(_) => "STRING".to_string(),
+            TokenType::Number(_) => "NUMBER".to_string(),
+            TokenType::Identifier(_) => "IDENTIFIER".to_string(),
+
+            TokenType::AND => "AND".to_string(),    
+            TokenType::CLASS => "CLASS".to_string(),
+            TokenType::ELSE => "ELSE".to_string(),
+            TokenType::FALSE => "FALSE".to_string(),
+            TokenType::FOR => "FOR".to_string(),
+            TokenType::FUN => "FUN".to_string(),
+            TokenType::IF => "IF".to_string(),
+            TokenType::NIL => "NIL".to_string(),
+            TokenType::OR => "OR".to_string(),
+            TokenType::PRINT => "PRINT".to_string(),
+            TokenType::RETURN => "RETURN".to_string(),
+            TokenType::SUPER => "SUPER".to_string(),
+            TokenType::THIS => "THIS".to_string(),
+            TokenType::TRUE => "TRUE".to_string(),
+            TokenType::VAR => "VAR".to_string(),
+            TokenType::WHILE => "WHILE".to_string(),
+
+            TokenType::UnterminatedString(_) => "UnterminatedString".to_string(),
+            TokenType::Unknown => "Unknown".to_string(),
+        }
+    }
+
+    /// Returns a string representation of the token in the format:
+    /// <token_type> <lexeme> <literal>
+    /// This is used for the "tokenize" command.
+    pub fn tokenized_string(&self) -> String {
+        match &self.token_type {
+            // Errors
             TokenType::UnterminatedString(_) => {
                 format!("[line {}] Error: Unterminated string.", self.line)
             }
@@ -103,6 +114,15 @@ impl Token {
                 format!(
                     "[line {}] Error: Unexpected character: {}",
                     self.line, self.lexeme
+                )
+            }
+
+            _ => {
+                format!(
+                    "{} {} {}",
+                    self.get_name(),
+                    self.lexeme,
+                    self.get_value()
                 )
             }
         }
