@@ -23,6 +23,9 @@ impl Visitor<String> for AstPrinter {
             TokenType::String(_) | TokenType::Number(_) => {
                 token.get_value()
             }
+            TokenType::TRUE => "true".to_string(),
+            TokenType::FALSE => "false".to_string(),
+            TokenType::NIL => "nil".to_string(),
             _ => "not implemented".to_string(),
         }
     }

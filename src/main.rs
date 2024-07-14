@@ -52,8 +52,14 @@ fn main() {
         "parse" => {
             let tokens = lexer.get_tokens();
             let mut parser = SyntaxTree::new(tokens);
-            let expr = parser.expression().unwrap();
-            println!("{}", AstPrinter::print(expr));
+
+            match parser.expression() {
+                Ok(expr) => println!("{}", AstPrinter::print(expr)),
+                Err(err) => {
+                    writeln!(stderr(), "[line {}] {}", err.line, err.message).expect("Failed to write to stderr");
+                    std::process::exit(EXIT_LEXICAL_ERROR);
+                }
+            }
         }
 
         _ => {

@@ -10,9 +10,9 @@ pub struct SyntaxTree {
 
 #[derive(Debug, PartialEq)]
 pub struct ParserError {
-    message: String,
-    line: usize,
-    character: usize,
+    pub message: String,
+    pub line: usize,
+    pub character: usize,
 }
 
 impl ParserError {
