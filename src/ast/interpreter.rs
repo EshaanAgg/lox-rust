@@ -1,13 +1,27 @@
+use std::fmt::Display;
+
 use anyhow::Error;
 
 use super::expr::Expr;
 use super::expr::Visitor;
 use crate::lexer::{token::Token, types::TokenType};
 
-pub struct Interpreter {}
+pub struct Interpreter {
+    expr: Expr,
+}
+
+impl Interpreter {
+    pub fn new(expr: Expr) -> Self {
+        Interpreter { expr }
+    }
+
+    pub fn evaluate(&self) -> Result<Value, Error> {
+        self.expr.accept(self)
+    }
+}
 
 #[derive(Debug, PartialEq)]
-enum Value {
+pub enum Value {
     Number(f32),
     String(String),
     Boolean(bool),
@@ -29,6 +43,17 @@ impl Value {
                 "Expected boolean value, got {:?}",
                 self
             ))),
+        }
+    }
+}
+
+impl Display for Value {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Value::Number(num) => write!(f, "{}", num),
+            Value::String(str) => write!(f, "{}", str),
+            Value::Boolean(b) => write!(f, "{}", b),
+            Value::Nil => write!(f, "nil"),
         }
     }
 }
@@ -213,14 +238,13 @@ fn test_interpreter() {
         },
     ];
 
-    let interpreter = Interpreter {};
     for test in test_cases {
         let tokens = crate::lexer::lexer::Lexer::new(test.input).get_tokens();
         let mut parser = super::syntax_tree::SyntaxTree::new(tokens);
         let expr = parser.expression().unwrap();
-        let result = expr.accept(&interpreter);
+        let interpreter = Interpreter::new(expr);
 
-        match (result, test.should_err) {
+        match (interpreter.evaluate(), test.should_err) {
             (Ok(val), false) => assert_eq!(val, test.expected),
             (Err(_), true) => {}
             (res, _) => panic!(

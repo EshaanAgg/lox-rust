@@ -5,12 +5,14 @@ use std::io::{stderr, Write};
 mod ast;
 mod lexer;
 
-use lexer::lexer::Lexer;
-use ast::syntax_tree::SyntaxTree;
+use ast::interpreter::Interpreter;
 use ast::printer::AstPrinter;
+use ast::syntax_tree::SyntaxTree;
+use lexer::lexer::Lexer;
 
 const EXIT_FILE_ERROR: i32 = 1;
 const EXIT_LEXICAL_ERROR: i32 = 65;
+const RUNTIME_ERROR: i32 = 70;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -56,8 +58,30 @@ fn main() {
             match parser.expression() {
                 Ok(expr) => println!("{}", AstPrinter::print(expr)),
                 Err(err) => {
-                    writeln!(stderr(), "[line {}] {}", err.line, err.message).expect("Failed to write to stderr");
+                    writeln!(stderr(), "[line {}] {}", err.line, err.message)
+                        .expect("Failed to write to stderr");
                     std::process::exit(EXIT_LEXICAL_ERROR);
+                }
+            }
+        }
+
+        "evaluate" => {
+            let tokens = lexer.get_tokens();
+            let mut parser = SyntaxTree::new(tokens);
+            let expr = parser.expression();
+
+            if let Err(err) = expr {
+                writeln!(stderr(), "[line {}] {}", err.line, err.message)
+                    .expect("Failed to write to stderr");
+                std::process::exit(EXIT_LEXICAL_ERROR);
+            }
+
+            let interpreter = Interpreter::new(expr.unwrap());
+            match interpreter.evaluate() {
+                Ok(val) => println!("{}", val),
+                Err(err) => {
+                    writeln!(stderr(), "{}", err).expect("Failed to write to stderr");
+                    std::process::exit(RUNTIME_ERROR);
                 }
             }
         }
