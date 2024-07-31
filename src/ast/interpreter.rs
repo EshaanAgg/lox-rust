@@ -174,7 +174,11 @@ impl Visitor<Result<Value, Error>> for Interpreter {
 
         match op.token_type {
             TokenType::Minus => val.expect_number().map(|num| Value::Number(-num)),
-            TokenType::Bang => val.expect_boolean().map(|b| Value::Boolean(!b)),
+            TokenType::Bang => match val {
+                Value::Boolean(b) => Ok(Value::Boolean(!b)),
+                Value::Nil => Ok(Value::Boolean(true)),
+                _ => Ok(Value::Boolean(false)),
+            },
 
             _ => panic!(
                 "Unexpected operator {:?} which should not be allowed by the AST parser.",
